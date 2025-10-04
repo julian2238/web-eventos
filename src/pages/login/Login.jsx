@@ -1,7 +1,6 @@
-import React from 'react'
 import emailIcon from '/src/assets/email.svg'
 import passwordIcon from '/src/assets/password.svg'
-import background from '../../../public/backgroundLogin.jpg'
+import background from '../../assets/backgroundLogin.jpg'
 import './Login.css'
 
 const Login = () => {
