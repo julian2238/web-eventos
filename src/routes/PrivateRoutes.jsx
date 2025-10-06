@@ -1,11 +1,13 @@
-import React from 'react'
-import { Navigate } from 'react-router'
+import { Navigate, useLocation } from 'react-router'
+import useAuthStore from '../store/useAuthStore'
 
-const PrivateRoutes = ({children, user, redirectPath = "/"}) => {
-    console.log(children, user)
-    if(!user){
-        return <Navigate to={redirectPath} replace/>
-    }  
+const PrivateRoutes = ({ children }) => {
+    const token = useAuthStore((state) => state.token)
+    const location = useLocation()
+
+    if (!token) {
+        return <Navigate to={'/login'} state={{ from: location }} replace />
+    }
     return children
 }
 

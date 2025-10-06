@@ -1,21 +1,25 @@
-import { Route, Routes } from 'react-router'
-import Login from './pages/login/Login'
+import { Navigate, Route, Routes } from 'react-router'
 import PrivateRoutes from './routes/PrivateRoutes'
-import Dashboard from './pages/dashboard/Dashboard'
+import PrivateLayout from './core/PrivateLayout/PrivateLayout'
+import { Dashboard, Login, Users } from './pages'
 
 const App = () => {
     return (
         <>
             <Routes>
-                <Route path='/' element={<Login />} />
+                <Route path='/login' element={<Login />} />
                 <Route
-                    path='dashboard'
+                    path='/'
                     element={
-                        <PrivateRoutes user={'data'}>
-                            <Dashboard />
+                        <PrivateRoutes>
+                            <PrivateLayout />
                         </PrivateRoutes>
                     }
-                />
+                >
+                    <Route index element={<Dashboard />} />
+                    <Route path='users' element={<Users />} />
+                </Route>
+                <Route path='*' element={<Navigate to='/login' replace />} />
             </Routes>
         </>
     )
