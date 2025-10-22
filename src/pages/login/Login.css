@@ -27,7 +27,7 @@
     justify-content: center;
 }
 
-form {
+.formLogin {
     width: 90%;
     background-color: #fff;
     padding: 3.125rem 2.5rem;

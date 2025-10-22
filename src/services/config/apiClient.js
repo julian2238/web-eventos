@@ -1,7 +1,5 @@
 import axios from 'axios'
-import useAuthStore from '../store/useAuthStore'
-
-const urlAPI = import.meta.env.VITE_API_URL
+import useAuthStore from '../../store/useAuthStore'
 
 const apiClient = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
@@ -13,8 +11,6 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
     (request) => {
         const token = useAuthStore.getState().token
-
-        //* Pendiente validar algunas peticiones que no necesitan token
 
         if (token) {
             request.headers['Authorization'] = `Bearer ${token}`
@@ -39,7 +35,12 @@ apiClient.interceptors.response.use(
 
             if (refreshToken) {
                 try {
-                    const response = await axios.post(`${urlAPI}/auth/refresh`, { refreshToken })
+                    const response = await axios.post(
+                        `${import.meta.env.VITE_API_URL}/auth/refreshToken`,
+                        {
+                            refreshToken,
+                        },
+                    )
                     const { token: newToken, refreshToken: newRefreshToken } = response.data
 
                     useAuthStore.getState().setTokens(newToken, newRefreshToken)

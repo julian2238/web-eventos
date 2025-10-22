@@ -1,5 +1,11 @@
-import axiosClient from './axiosClient'
+import apiClient from './config/apiClient'
 
-export const loginService = () => {
-    return axiosClient.get('')
+const loginService = (data) => {
+    return apiClient.post('/auth/signin', data)
 }
+
+const authServices = {
+    loginService,
+}
+
+export default authServices

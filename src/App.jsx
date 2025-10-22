@@ -19,7 +19,7 @@ const App = () => {
                     <Route index element={<Dashboard />} />
                     <Route path='users' element={<Users />} />
                 </Route>
-                <Route path='*' element={<Navigate to='/login' replace />} />
+                {/* <Route path='*' element={<Navigate to='/login' replace />} /> */}
             </Routes>
         </>
     )

@@ -1,0 +1,66 @@
+.sidebar-aside {
+    height: 100vh;
+    width: 15.65rem;
+    background-color: #007a44;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.sidebar-ul {
+    flex: 1 1 0%;
+    /* border: 1px solid purple; */
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    border: 1px solid green;
+    padding: 1rem;
+}
+
+.footer {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    border-top: 0.1rem solid #ccc;
+    gap: 1rem;
+    background-color: #ffffff;
+}
+
+.sidebar-avatar {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 25%;
+    /* border: 1px solid blue; */
+}
+
+.footer-text {
+    /* border: 1px solid blue; */
+}
+
+.footer-text h4 {
+    font-size: 1.125rem;
+    color: #333;
+    margin: 0;
+    /* text-align: center; */
+    user-select: none;
+    pointer-events: none;
+}
+
+.footer-text p {
+    font-size: 0.85rem;
+    color: #666;
+    margin: 0;
+    text-align: center;
+    line-height: 1.5;
+    user-select: none;
+    pointer-events: none;
+    /* margin-top: 0.5rem; */
+}
