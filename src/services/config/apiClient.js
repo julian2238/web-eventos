@@ -1,62 +1,62 @@
-import axios from 'axios'
-import useAuthStore from '../../store/useAuthStore'
+import axios from 'axios';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
 const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
-    headers: {
-        'Content-Type': 'application/json',
-    },
-})
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
+// Request interceptor to add auth token
 apiClient.interceptors.request.use(
-    (request) => {
-        const token = useAuthStore.getState().token
+  (config) => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
-        if (token) {
-            request.headers['Authorization'] = `Bearer ${token}`
-        }
-
-        return request
-    },
-    (error) => {
-        return Promise.reject(error)
-    },
-)
-
+// Response interceptor to handle token refresh
 apiClient.interceptors.response.use(
-    (response) => response,
-    async (error) => {
-        const originalRequest = error.config
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
 
-        if (error.response.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
 
-            const refreshToken = useAuthStore.getState().refreshToken
+      try {
+        const refreshToken = localStorage.getItem('refreshToken');
+        if (refreshToken) {
+          const response = await axios.post(`${API_BASE_URL}/auth/refreshToken`, {
+            refreshToken,
+          });
 
-            if (refreshToken) {
-                try {
-                    const response = await axios.post(
-                        `${import.meta.env.VITE_API_URL}/auth/refreshToken`,
-                        {
-                            refreshToken,
-                        },
-                    )
-                    const { token: newToken, refreshToken: newRefreshToken } = response.data
+          const { token, refreshToken: newRefreshToken } = response.data.data;
+          localStorage.setItem('accessToken', token);
+          localStorage.setItem('refreshToken', newRefreshToken);
 
-                    useAuthStore.getState().setTokens(newToken, newRefreshToken)
-
-                    originalRequest.headers['Authorization'] = `Bearer ${newToken}`
-                    return apiClient(originalRequest)
-                } catch (error) {
-                    useAuthStore.getState().logout()
-                    return Promise.reject(error)
-                }
-            }
-
-            useAuthStore.getState().logout()
-            return Promise.reject(error)
+          // Retry the original request
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return apiClient(originalRequest);
         }
-    },
-)
+      } catch (refreshError) {
+        // Refresh failed, redirect to login
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        window.location.href = '/login';
+      }
+    }
 
-export default apiClient
+    return Promise.reject(error);
+  }
+);
+
+export default apiClient;

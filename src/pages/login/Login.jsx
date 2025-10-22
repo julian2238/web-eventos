@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form'
 import background from '../../assets/backgroundLogin.jpg'
 import './Login.css'
-import authServices from '../../services/auth.services'
+import { authService } from '../../services/auth.services'
 import useAuthStore from '../../store/useAuthStore'
 import { Navigate, useNavigate } from 'react-router'
 
@@ -71,28 +71,21 @@ const Form = ({ onSubmit }) => {
 }
 
 const Login = () => {
-    const login = useAuthStore((state) => state.login)
+    const { login, isAuthenticated, isLoading, error } = useAuthStore()
     const navigate = useNavigate()
 
     const onSubmit = async (data) => {
         try {
             const { email, password } = data
-
-            const response = await authServices.loginService({ email, password, platform: 'web' })
-
-            const { status, message, data: datos } = response.data
-
-            if (status) {
-                const { token, refreshToken, uid, fullName, role } = datos
-
-                const user = { uid, fullName, role, email }
-
-                login(user, token, refreshToken)
-                navigate('/')
-            }
+            await login(email, password)
+            navigate('/dashboard')
         } catch (error) {
-            console.log(error)
+            console.log('Login error:', error)
         }
+    }
+
+    if (isAuthenticated) {
+        return <Navigate to="/dashboard" replace />
     }
 
     return (

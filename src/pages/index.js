@@ -1,3 +1,5 @@
 export { default as Login } from './login/Login'
 export { default as Dashboard } from './dashboard/Dashboard'
 export { default as Users } from './users/Users'
+export { default as Events } from './events/Events'
+export { default as Categories } from './categories/Categories'

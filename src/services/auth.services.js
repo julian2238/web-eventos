@@ -1,11 +1,40 @@
-import apiClient from './config/apiClient'
+import apiClient from './config/apiClient';
 
-const loginService = (data) => {
-    return apiClient.post('/auth/signin', data)
-}
+export const authService = {
+  // Login
+  login: async (email, password) => {
+    const response = await apiClient.post('/auth/signin', {
+      email,
+      password,
+      platform: 'web',
+    });
+    return response.data;
+  },
 
-const authServices = {
-    loginService,
-}
+  // Register
+  register: async (userData) => {
+    const response = await apiClient.post('/auth/signup', userData);
+    return response.data;
+  },
 
-export default authServices
+  // Refresh token
+  refreshToken: async (refreshToken) => {
+    const response = await apiClient.post('/auth/refreshToken', {
+      refreshToken,
+    });
+    return response.data;
+  },
+
+  // Get profile
+  getProfile: async () => {
+    const response = await apiClient.get('/auth/profile');
+    return response.data;
+  },
+
+  // Logout
+  logout: () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+  },
+};

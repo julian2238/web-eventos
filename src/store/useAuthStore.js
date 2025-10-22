@@ -1,14 +1,75 @@
-import { create } from 'zustand'
+import { create } from 'zustand';
+import { authService } from '../services/auth.services';
 
-const useAuthStore = create((set) => ({
-    userData: null,
-    token: null,
-    refreshToken: null,
-    isAuthenticated: false,
+const useAuthStore = create((set, get) => ({
+  user: null,
+  isAuthenticated: false,
+  isLoading: false,
+  error: null,
 
-    login: (user, token, refreshToken) => set({ user, token, refreshToken, isAuthenticated: true }),
-    logout: () => set({ user: null, token: null, refreshToken: null, isAuthenticated: false }),
-    setTokens: (token, refreshToken) => set({ token, refreshToken }),
-}))
+  // Login action
+  login: async (email, password) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await authService.login(email, password);
+      const { data } = response;
+      
+      // Store tokens
+      localStorage.setItem('accessToken', data.token);
+      localStorage.setItem('refreshToken', data.refreshToken);
+      localStorage.setItem('user', JSON.stringify({
+        uid: data.uid,
+        fullName: data.fullName,
+        role: data.role,
+      }));
 
-export default useAuthStore
+      set({ 
+        user: {
+          uid: data.uid,
+          fullName: data.fullName,
+          role: data.role,
+        },
+        isAuthenticated: true,
+        isLoading: false,
+        error: null
+      });
+
+      return response;
+    } catch (error) {
+      set({ 
+        error: error.response?.data?.message || 'Error al iniciar sesión',
+        isLoading: false 
+      });
+      throw error;
+    }
+  },
+
+  // Logout action
+  logout: () => {
+    authService.logout();
+    set({ user: null, isAuthenticated: false, error: null });
+  },
+
+  // Initialize auth from localStorage
+  initializeAuth: () => {
+    const token = localStorage.getItem('accessToken');
+    const user = localStorage.getItem('user');
+    
+    if (token && user) {
+      try {
+        const userData = JSON.parse(user);
+        set({ 
+          user: userData,
+          isAuthenticated: true 
+        });
+      } catch (error) {
+        authService.logout();
+      }
+    }
+  },
+
+  // Clear error
+  clearError: () => set({ error: null }),
+}));
+
+export default useAuthStore;
